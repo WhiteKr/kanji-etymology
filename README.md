@@ -7,7 +7,16 @@
 
 **배포**: <https://whitekr.github.io/kanji-etymology/> (main push 시 자동 배포)
 
-> ✅ **현재 상태**: MVP 배포됨 (한자 50자, M1~M8 완료). 남은 것: 콘텐츠 검수([검수 노트](docs/content-review-notes.md)), 피드백 Worker 배포. [구현 계획](docs/2026-07-11-implementation-plan.md) 참조.
+> ✅ **현재 상태**: MVP 배포됨 (한자 50자, M1~M8 + 피드백 파이프라인 E2E 검증 완료).
+> 남은 것: 콘텐츠 검수([검수 노트](docs/content-review-notes.md)), Turnstile 실키 교체(현재 테스트 키 — 캡차가 실제로 봇을 막지 않음), 외부 시범 사용자.
+
+## 피드백 파이프라인 (운영)
+
+웹 폼 → Cloudflare Worker(`kanji-feedback.whitekr.workers.dev`) → Turnstile 검증 → KV rate limit(IP당 5건/시간) → GitHub Issue 자동 생성(`feedback` 라벨).
+제보 검토 후 `content/` 수정 → push → 자동 재배포.
+
+Turnstile 실키 교체: [대시보드](https://dash.cloudflare.com/?to=/:account/turnstile)에서 위젯 생성 후
+`crates/web/src/feedback_modal.rs`의 `TURNSTILE_SITE_KEY` 교체 + `wrangler secret put TURNSTILE_SECRET`.
 
 ## 로컬 개발
 
