@@ -1,0 +1,10 @@
+# worker-build(wrangler deploy)는 이 디렉터리에서 cargo를 실행하므로
+# 이 설정은 feedback-worker 빌드에만 적용된다.
+#
+# 워크스페이스 릴리스 프로필의 `strip = true`는 wasm의 `target_features`
+# 커스텀 섹션까지 제거한다. 그러면 wasm-bindgen CLI(0.2.126+)가
+# reference-types 활성 여부를 감지하지 못해
+# "externref table required for catch wrappers" 오류로 실패한다.
+# Worker 모듈은 어차피 wasm-bindgen이 후처리하므로 strip을 끈다.
+[profile.release]
+strip = false

@@ -16,7 +16,7 @@ GITHUB_REPO = "WhiteKr/kanji-etymology"
 # `wrangler kv namespace create RATE_LIMIT_KV` 실행 후 출력된 id를 아래에 채워 넣는다.
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "TODO: wrangler kv namespace create RATE_LIMIT_KV 실행 후 id 입력"
+id = "bab15668a1ce4858ba6f2431fb045bac"
 
 # --- Secrets (wrangler.toml에는 절대 값을 직접 넣지 않는다) ---
 # 아래 명령으로 등록:
