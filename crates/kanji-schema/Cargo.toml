@@ -1,0 +1,12 @@
+[package]
+name = "kanji-schema"
+version.workspace = true
+edition.workspace = true
+description = "한자/부수 콘텐츠 frontmatter의 공유 데이터 모델 (wasm32 호환)"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+
+# 테스트 전용 (wasm 빌드에는 영향 없음)
+[dev-dependencies]
+serde_json = { workspace = true }

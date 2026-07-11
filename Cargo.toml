@@ -4,6 +4,7 @@ members = [
     "crates/web",
     "crates/build-data",
     "crates/feedback-worker",
+    "crates/kanji-schema",
 ]
 
 [workspace.package]
@@ -12,8 +13,13 @@ edition = "2021"
 license = "UNLICENSED" # 라이선스 미정 (README 참조)
 repository = ""
 
-# 공유 의존성은 M2에서 스키마 크레이트 도입 시 여기에 추가
+# M2에서 도입한 공유 의존성 (build-data ↔ kanji-schema)
 [workspace.dependencies]
+serde = "1"
+serde_yaml = "0.9"
+serde_json = "1"
+anyhow = "1"
+kanji-schema = { path = "crates/kanji-schema" }
 
 # WASM 릴리스 번들 크기 최적화 (설계 15장 리스크 대응)
 [profile.release]
