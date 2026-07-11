@@ -1,4 +1,4 @@
-# Cloudflare Worker 설정 — M7에서 구성 확정
+# Cloudflare Worker 설정 — M7 (docs/2026-07-11-implementation-plan.md 참조)
 name = "kanji-feedback"
 main = "build/worker/shim.mjs"
 compatibility_date = "2026-07-01"
@@ -6,6 +6,21 @@ compatibility_date = "2026-07-01"
 [build]
 command = "cargo install -q worker-build && worker-build --release"
 
-# M7에서 추가:
-# - KV 네임스페이스 (rate limit)
-# - secrets: GITHUB_PAT, TURNSTILE_SECRET
+[vars]
+# GitHub Pages 배포 도메인만 허용 (쉼표로 여러 origin 나열 가능, 예: "https://a.example,https://b.example")
+ALLOWED_ORIGIN = "https://<github-user>.github.io"
+# 피드백 Issue를 생성할 저장소. "owner/repo" 형식.
+GITHUB_REPO = "<owner>/<repo>"
+
+# Rate limit용 Workers KV 네임스페이스 (IP당 5건/시간, TTL 1시간 카운터).
+# `wrangler kv namespace create RATE_LIMIT_KV` 실행 후 출력된 id를 아래에 채워 넣는다.
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "TODO: wrangler kv namespace create RATE_LIMIT_KV 실행 후 id 입력"
+
+# --- Secrets (wrangler.toml에는 절대 값을 직접 넣지 않는다) ---
+# 아래 명령으로 등록:
+#   wrangler secret put GITHUB_PAT
+#     - GitHub fine-grained PAT, 대상 저장소 한정, Issues:write 권한만 부여
+#   wrangler secret put TURNSTILE_SECRET
+#     - Cloudflare Turnstile 위젯의 secret key
