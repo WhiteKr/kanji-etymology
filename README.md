@@ -7,7 +7,7 @@
 
 ## 설계 문서
 
-- [MVP 디자인 (2026-05-27)](docs/superpowers/specs/2026-05-27-kanji-etymology-mvp-design.md)
+- [MVP 디자인 (2026-05-27)](docs/2026-05-27-kanji-etymology-mvp-design.md)
 
 ## 기술 스택 (계획)
 
@@ -30,7 +30,7 @@
 │   ├── kanji/              # 한자 .md 파일들
 │   └── radicals/           # 부수 정보
 ├── public/                 # PWA manifest, 아이콘, 폰트 등
-├── docs/superpowers/specs/ # 설계 문서
+├── docs/                   # 설계 문서
 └── .github/workflows/      # CI/CD
 ```
 
