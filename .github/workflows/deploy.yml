@@ -1,0 +1,89 @@
+# 한자 어원 사전 — GitHub Pages 배포 워크플로 (M8)
+#
+# main push → 테스트 → 콘텐츠 검증·데이터 생성 → dx 웹 번들 → Pages 배포.
+# 단계가 순서대로 이어지므로 테스트 실패나 build-data 검증 실패 시
+# 뒤 단계가 실행되지 않아 배포가 자연히 중단된다.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# actions/deploy-pages(OIDC 배포)에 필요한 권한
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시 배포 방지 — 진행 중인 배포는 취소하지 않고 대기 중인 것만 교체
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # rust-toolchain.toml(채널 1.97.0 + wasm32-unknown-unknown 타깃)을 존중 —
+      # rustup이 파일을 읽어 툴체인과 타깃을 함께 설치한다
+      - name: Rust 툴체인 설치
+        run: rustup toolchain install
+
+      # target/ 캐시 (설계 문서 15장 — Rust+WASM 빌드 시간 완화)
+      - name: Rust 빌드 캐시
+        uses: Swatinem/rust-cache@v2
+
+      - name: 테스트
+        run: cargo test --workspace
+
+      # dioxus-cli는 소스 빌드가 매우 느리므로 cargo-binstall 프리빌트 바이너리 사용.
+      # 버전은 로컬 개발 환경과 동일하게 고정 (0.7.9)
+      - name: cargo-binstall 설치
+        uses: cargo-bins/cargo-binstall@main
+      - name: dioxus-cli 설치
+        run: cargo binstall dioxus-cli@0.7.9 --no-confirm
+
+      # 콘텐츠 파싱 + 참조 무결성 검증 + 검색 인덱스 생성.
+      # 검증 실패 시 비정상 종료 → 배포 중단
+      - name: 데이터 생성 (build-data)
+        run: cargo run -p build-data -- --content-dir content --out-dir crates/web/assets/data
+
+      # 정적 웹 번들. base_path("kanji-etymology")는 crates/web/Dioxus.toml에서 읽는다.
+      # 산출물 사이트 루트는 dist-web/public/
+      - name: 웹 번들 (dx bundle)
+        run: dx bundle --web --release -p kanji-web --out-dir dist-web
+
+      # sw.js는 서비스 워커 scope 규칙(파일 위치 이하만 제어 가능) 때문에
+      # dx asset 시스템(/assets/ 하위)이 아니라 사이트 루트에 있어야 한다.
+      # 복사하면서 캐시 버전 문자열을 커밋 SHA로 치환 → 배포마다 캐시 무효화
+      - name: 서비스 워커 배치 + 캐시 버전 주입
+        run: sed "s/__BUILD_VERSION__/${GITHUB_SHA}/" public/sw.js > dist-web/public/sw.js
+
+      # GitHub Pages에는 서버 라우팅이 없어 /kanji/学 같은 딥링크 직접 진입 시
+      # 404가 난다. index.html을 404.html로 그대로 복사하면 어떤 경로에서든
+      # 앱 셸이 로드되고 Dioxus Router가 클라이언트에서 전체 경로를 해석한다.
+      # 설계 문서 6장의 "hash 보존 리다이렉트" 트릭(404.html이 경로를 hash에 실어
+      # index로 리다이렉트)은 셸이 정적 HTML 전용일 때 필요한 우회인데,
+      # 여기서는 404.html 자체가 앱 셸이라 리다이렉트 없이 동작하므로
+      # 더 단순한 이 방식을 쓴다.
+      - name: SPA 404 폴백 생성
+        run: cp dist-web/public/index.html dist-web/public/404.html
+
+      - name: Pages 아티팩트 업로드
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-web/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages 배포
+        id: deployment
+        uses: actions/deploy-pages@v4

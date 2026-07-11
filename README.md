@@ -1,9 +1,27 @@
 # 한자 어원 학습 모듈 (가제)
 
+[![deploy](https://github.com/WhiteKr/kanji-etymology/actions/workflows/deploy.yml/badge.svg)](https://github.com/WhiteKr/kanji-etymology/actions/workflows/deploy.yml)
+
 한국인 일본어 학습자를 위한, **어원 스토리와 부수 분해 중심의 한자 사전**.
 한자를 *외우는* 게 아니라 *이해*하는 경험을 목표로 합니다.
 
-> 🚧 **현재 상태**: 구현 중 — M1 (워크스페이스 스캐폴딩) 완료. [구현 계획](docs/2026-07-11-implementation-plan.md) 참조.
+**배포**: <https://whitekr.github.io/kanji-etymology/> (main push 시 자동 배포)
+
+> 🚧 **현재 상태**: 구현 중 — M8 (PWA + CI/CD). [구현 계획](docs/2026-07-11-implementation-plan.md) 참조.
+
+## 로컬 개발
+
+```powershell
+# 1. 콘텐츠 → 데이터 JSON 생성 (검증 포함, 최초 1회 및 콘텐츠 변경 시)
+cargo run -p build-data -- --content-dir content --out-dir crates/web/assets/data
+
+# 2. 개발 서버 (Dioxus CLI 필요: cargo binstall dioxus-cli)
+dx serve -p kanji-web
+# base_path 설정으로 http://127.0.0.1:8080/kanji-etymology/ 에서 열림
+
+# 테스트
+cargo test --workspace
+```
 
 ## 문서
 
@@ -30,7 +48,7 @@
 ├── content/
 │   ├── kanji/              # 한자 .md 파일들
 │   └── radicals/           # 부수 정보
-├── public/                 # PWA manifest, 아이콘, 폰트 등
+├── public/                 # 사이트 루트에 배치할 파일 (sw.js — CI가 번들 루트로 복사)
 ├── docs/                   # 설계 문서
 └── .github/workflows/      # CI/CD
 ```

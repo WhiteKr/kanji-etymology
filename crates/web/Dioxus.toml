@@ -4,5 +4,9 @@ default_platform = "web"
 
 [web.app]
 title = "한자 어원 사전"
-# GitHub Pages 프로젝트 페이지로 배포할 경우 M8에서 base_path 설정
-# base_path = "<repo-name>"
+# GitHub Pages 프로젝트 페이지(https://whitekr.github.io/kanji-etymology/) 배포용 서브 경로.
+# - 라우터: dioxus-web history가 이 값을 자동으로 접두어로 사용 (릴리스는 컴파일 타임
+#   env, 디버그는 dx가 주입하는 meta 태그에서 읽음 — dioxus_cli_config::web_base_path)
+# - 애셋: asset!() 경로 resolve 시 자동으로 앞에 붙음
+# - dx serve도 http://localhost:8080/kanji-etymology/ 아래에서 서빙됨
+base_path = "kanji-etymology"

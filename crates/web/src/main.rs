@@ -16,6 +16,16 @@ use search_modal::SearchModal;
 /// 전체 페이지 CSS (모바일 퍼스트, CSS 변수 테마).
 static MAIN_CSS: Asset = asset!("/assets/main.css");
 
+/// PWA 애셋(manifest.json + 아이콘) 폴더 애셋 (M8).
+/// DATA_DIR(api.rs)과 같은 방식 — 해시 접미사를 꺼서 내부 파일 상대 경로가 유지되고,
+/// base_path(GitHub Pages 서브 경로)도 resolve 시 자동 반영된다.
+/// manifest.json의 start_url/scope는 manifest 위치 기준 상대 경로("../../")로
+/// base path 루트를 가리키므로 별도 치환이 필요 없다.
+static PWA_DIR: Asset = asset!(
+    "/assets/pwa",
+    AssetOptions::builder().with_hash_suffix(false)
+);
+
 /// 앱 라우트. URL의 한자(`/kanji/学`)는 브라우저에서 percent-encoding되지만
 /// dioxus-router가 디코딩해서 `character` 프롭으로 넘겨준다.
 ///
@@ -64,6 +74,30 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    // 서비스 워커 등록 (M8 PWA) — 릴리스 빌드에서만.
+    // - dx serve(디버그)는 /sw.js 요청에 SPA 폴백(HTML)을 200으로 돌려줘 MIME 오류가
+    //   나고, 개발 중 캐시가 끼면 혼란만 생기므로 디버그에서는 등록하지 않는다.
+    // - base path는 location 기준 상대 경로로 감지하지 않고 컴파일 타임 설정
+    //   (dioxus::cli_config::base_path — Dioxus.toml의 base_path가 릴리스 빌드에
+    //   구워짐)에서 읽는다. `/kanji-etymology/kanji/学` 같은 딥링크로 첫 진입하면
+    //   location만으로는 base 경계가 모호하기 때문. sw.js 내부 경로는 전부
+    //   SW 파일 위치 기준 상대 경로라 여기서 등록 URL만 맞으면 된다.
+    use_effect(|| {
+        if cfg!(debug_assertions) {
+            return;
+        }
+        let base = dioxus::cli_config::base_path()
+            .map(|p| format!("/{}", p.trim_matches('/')))
+            .unwrap_or_default();
+        document::eval(&format!(
+            r#"if ("serviceWorker" in navigator) {{
+                navigator.serviceWorker
+                    .register("{base}/sw.js")
+                    .catch((e) => console.warn("서비스 워커 등록 실패:", e));
+            }}"#
+        ));
+    });
+
     rsx! {
         // 한자 표시용 Noto Sans JP 웹폰트 (구글 폰트, font-display: swap).
         // 한글 본문은 시스템 폰트 스택을 쓴다 (main.css 참조).
@@ -78,6 +112,11 @@ fn App() -> Element {
             href: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap",
         }
         document::Stylesheet { href: MAIN_CSS }
+
+        // PWA manifest (M8) — "홈 화면에 추가" 설치 지원.
+        document::Link { rel: "manifest", href: "{PWA_DIR}/manifest.json" }
+        // 모바일 브라우저 상단 UI 색 — main.css --color-bg(사이트 헤더 배경)와 동일.
+        document::Meta { name: "theme-color", content: "#faf9f6" }
 
         Router::<Route> {}
     }
