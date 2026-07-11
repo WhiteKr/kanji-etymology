@@ -50,8 +50,11 @@ jobs:
       # 버전은 로컬 개발 환경과 동일하게 고정 (0.7.9)
       - name: cargo-binstall 설치
         uses: cargo-bins/cargo-binstall@main
+      # --force 필수: rust-cache가 binstall 설치 기록(~/.cargo/.crates.toml)은
+      # 복원하지만 바이너리는 복원하지 않을 수 있어, force 없이는 "이미 설치됨"으로
+      # 건너뛰고 dx가 PATH에 없는 상태가 된다
       - name: dioxus-cli 설치
-        run: cargo binstall dioxus-cli@0.7.9 --no-confirm
+        run: cargo binstall dioxus-cli@0.7.9 --no-confirm --force
 
       # 정적 웹 번들. base_path("kanji-etymology")는 crates/web/Dioxus.toml에서 읽는다.
       # 산출물 사이트 루트는 dist-web/public/
