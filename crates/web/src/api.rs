@@ -16,8 +16,10 @@
 //! 생성 명령: `cargo run -p build-data -- --content-dir content --out-dir crates/web/assets/data`
 //! (산출물은 커밋하지 않는다 — 루트 `.gitignore` 참조)
 
+use std::collections::HashMap;
+
 use dioxus::prelude::*;
-use kanji_schema::KanjiEntry;
+use kanji_schema::{KanjiEntry, RadicalEntry};
 use serde::Deserialize;
 
 /// build-data 출력 폴더 전체를 번들하는 폴더 애셋.
@@ -45,6 +47,26 @@ pub struct KanjiSummary {
     pub jlpt: Option<String>,
     pub stroke_count: Option<u32>,
     pub grade: Option<u8>,
+}
+
+/// `radicals/{부수}.json` — RadicalEntry 전 필드 + 어원 서술 마크다운 원문.
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct RadicalDetail {
+    #[serde(flatten)]
+    pub entry: RadicalEntry,
+    /// 부수 어원 서술 마크다운 원문.
+    pub body_markdown: String,
+}
+
+/// `radicals-list.json`의 항목 하나 (부수 인덱스 페이지용 요약).
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct RadicalSummary {
+    pub radical: String,
+    pub name: String,
+    pub meaning: String,
+    pub stroke_count: u32,
+    /// 이 부수를 부품으로 갖는 등재 한자 수.
+    pub kanji_count: usize,
 }
 
 /// 데이터 fetch 실패 종류. 404(콘텐츠 없음)는 별도 안내를 위해 구분한다.
@@ -105,6 +127,21 @@ pub async fn fetch_kanji(character: &str) -> Result<KanjiDetail, FetchError> {
 /// 전체 한자 요약 목록(`kanji-list.json`)을 불러온다.
 pub async fn fetch_kanji_list() -> Result<Vec<KanjiSummary>, FetchError> {
     fetch_json(&format!("{DATA_DIR}/kanji-list.json")).await
+}
+
+/// 부수 상세 JSON(`radicals/{부수}.json`)을 불러온다.
+pub async fn fetch_radical(radical: &str) -> Result<RadicalDetail, FetchError> {
+    fetch_json(&format!("{DATA_DIR}/radicals/{radical}.json")).await
+}
+
+/// 전체 부수 요약 목록(`radicals-list.json`)을 불러온다 (/radicals 인덱스).
+pub async fn fetch_radicals_list() -> Result<Vec<RadicalSummary>, FetchError> {
+    fetch_json(&format!("{DATA_DIR}/radicals-list.json")).await
+}
+
+/// 부수/부품 → 그 부품을 가진 한자 목록 역인덱스(`by-radical.json`)를 불러온다.
+pub async fn fetch_by_radical() -> Result<HashMap<String, Vec<String>>, FetchError> {
+    fetch_json(&format!("{DATA_DIR}/by-radical.json")).await
 }
 
 /// 검색 인덱스(`search-index.json`)를 불러온다 (M5 — 검색 모달 첫 오픈 시 lazy).

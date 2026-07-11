@@ -62,6 +62,8 @@ pub fn KanjiPage(character: ReadSignal<String>) -> Element {
                         }
                         Link { class: "button-link", to: Route::Landing {}, "홈으로 돌아가기" }
                     }
+                    // 미등재 한자 대신 등재된 한자 추천 + 검색 진입 (M6 친절한 404).
+                    super::not_found::KanjiSuggestions {}
                 },
                 Some(Err(err)) => rsx! {
                     section { class: "status-block",

@@ -10,7 +10,7 @@ mod pages;
 mod search;
 mod search_modal;
 
-use pages::{KanjiPage, Landing, NotFound, RadicalPage, SearchPage};
+use pages::{AboutPage, BrowsePage, KanjiPage, Landing, NotFound, RadicalPage, RadicalsPage, SearchPage};
 use search_modal::SearchModal;
 
 /// 전체 페이지 CSS (모바일 퍼스트, CSS 변수 테마).
@@ -33,9 +33,21 @@ enum Route {
         #[route("/kanji/:character")]
         KanjiPage { character: String },
 
-        // 부수 페이지 본 구현은 M6. 지금은 자리만 잡아 둔다 (components 링크 대상).
+        // 부수 페이지 — 부수 어원 + 해당 부수를 가진 한자 목록 (M6).
         #[route("/radical/:radical")]
         RadicalPage { radical: String },
+
+        // 부수 인덱스 — 전체 부수 일람 (M6).
+        #[route("/radicals")]
+        RadicalsPage {},
+
+        // 둘러보기 — 전체 한자 그리드 + JLPT/획수/부수 필터 (M6).
+        #[route("/browse")]
+        BrowsePage {},
+
+        // 소개 — 방법론·출처·한계·기여 안내 (M6).
+        #[route("/about")]
+        AboutPage {},
 
         // 검색 결과 페이지 (M5). `q`는 쿼리 파라미터 — 없으면 빈 문자열.
         #[route("/search?:q")]
@@ -101,6 +113,12 @@ fn SiteLayout() -> Element {
         header { class: "site-header",
             div { class: "site-header__inner",
                 Link { class: "site-header__brand", to: Route::Landing {}, "한자 어원 사전" }
+                // 주 내비게이션 — 모바일에서는 글자 크기를 줄여 한 줄 유지 (main.css).
+                nav { class: "site-header__nav", aria_label: "주 메뉴",
+                    Link { class: "site-header__nav-link", to: Route::BrowsePage {}, "둘러보기" }
+                    Link { class: "site-header__nav-link", to: Route::RadicalsPage {}, "부수" }
+                    Link { class: "site-header__nav-link", to: Route::AboutPage {}, "소개" }
+                }
                 button {
                     class: "site-header__search",
                     r#type: "button",

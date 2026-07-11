@@ -12,7 +12,10 @@ use kanji_schema::{KanjiEntry, RadicalEntry};
 use serde::Serialize;
 
 use crate::frontmatter::{parse_kanji_file, parse_radical_file};
-use crate::index::{build_by_radical_index, build_by_word_index, build_kanji_list, build_search_index};
+use crate::index::{
+    build_by_radical_index, build_by_word_index, build_kanji_list, build_radicals_list,
+    build_search_index,
+};
 
 /// 파이프라인 실행 결과 요약.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -166,10 +169,17 @@ pub fn run(content_dir: &Path, out_dir: &Path) -> Result<Summary> {
     fs::create_dir_all(&radicals_out_dir)?;
 
     let kanji_only: Vec<KanjiEntry> = kanji_entries.iter().map(|p| p.entry.clone()).collect();
+    let radicals_only: Vec<RadicalEntry> = radical_entries.iter().map(|p| p.entry.clone()).collect();
+    let by_radical = build_by_radical_index(&kanji_only);
 
     write_json(&out_dir.join("search-index.json"), &build_search_index(&kanji_only))?;
     write_json(&out_dir.join("kanji-list.json"), &build_kanji_list(&kanji_only))?;
-    write_json(&out_dir.join("by-radical.json"), &build_by_radical_index(&kanji_only))?;
+    // 부수 인덱스 페이지(/radicals)용 — 부수별 소속 한자 수를 함께 담는다.
+    write_json(
+        &out_dir.join("radicals-list.json"),
+        &build_radicals_list(&radicals_only, &by_radical),
+    )?;
+    write_json(&out_dir.join("by-radical.json"), &by_radical)?;
     write_json(&out_dir.join("by-word.json"), &build_by_word_index(&kanji_only))?;
 
     for pk in &kanji_entries {
@@ -277,6 +287,20 @@ mod tests {
             .unwrap()
             .iter()
             .any(|v| v == "学"));
+
+        // 부수 인덱스 페이지용 radicals-list.json — 부수 요약 + 소속 한자 수.
+        let radicals_list: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(out_dir.join("radicals-list.json")).unwrap())
+                .unwrap();
+        let radicals_arr = radicals_list.as_array().unwrap();
+        assert_eq!(radicals_arr.len(), summary.radical_count);
+        let mie = radicals_arr
+            .iter()
+            .find(|r| r["radical"] == "冖")
+            .expect("fixture의 冖 부수가 radicals-list에 있어야 합니다");
+        assert_eq!(mie["name"], "민갓머리");
+        // 学이 冖을 부품으로 가지므로 소속 한자 수는 1 이상이어야 한다.
+        assert!(mie["kanji_count"].as_u64().unwrap() >= 1);
 
         let _ = fs::remove_dir_all(&out_dir);
     }

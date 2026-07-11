@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use kanji_schema::KanjiEntry;
+use kanji_schema::{KanjiEntry, RadicalEntry};
 use serde::Serialize;
 
 use crate::kana::kana_to_romaji;
@@ -129,6 +129,41 @@ pub fn build_kanji_list(entries: &[KanjiEntry]) -> Vec<KanjiSummaryItem> {
         .collect()
 }
 
+/// `radicals-list.json`의 항목 하나 (부수 인덱스 페이지용 요약).
+#[derive(Debug, Serialize)]
+pub struct RadicalSummaryItem {
+    pub radical: String,
+    pub name: String,
+    pub meaning: String,
+    pub stroke_count: u32,
+    /// 이 부수를 구성 요소로 갖는 등재 한자 수 (by-radical 역인덱스 기준).
+    pub kanji_count: usize,
+}
+
+/// `radicals-list.json` 배열을 만든다. 획수 → 부수 문자 순으로 정렬해
+/// 출력이 결정적이고 인덱스 페이지에서 그대로 쓸 수 있게 한다.
+pub fn build_radicals_list(
+    radicals: &[RadicalEntry],
+    by_radical: &BTreeMap<String, Vec<String>>,
+) -> Vec<RadicalSummaryItem> {
+    let mut items: Vec<RadicalSummaryItem> = radicals
+        .iter()
+        .map(|r| RadicalSummaryItem {
+            radical: r.radical.clone(),
+            name: r.name.clone(),
+            meaning: r.meaning.clone(),
+            stroke_count: r.stroke_count,
+            kanji_count: by_radical.get(&r.radical).map_or(0, Vec::len),
+        })
+        .collect();
+    items.sort_by(|a, b| {
+        a.stroke_count
+            .cmp(&b.stroke_count)
+            .then_with(|| a.radical.cmp(&b.radical))
+    });
+    items
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -147,5 +182,37 @@ mod tests {
     #[test]
     fn meaning_keywords_single_word_has_one_key() {
         assert_eq!(meaning_keywords("배우다"), vec!["배우다"]);
+    }
+
+    #[test]
+    fn radicals_list_counts_members_and_sorts_by_stroke() {
+        let radicals = vec![
+            RadicalEntry {
+                radical: "木".into(),
+                name: "나무목".into(),
+                meaning: "나무".into(),
+                stroke_count: 4,
+                variants: vec![],
+                last_updated: "2026-07-11".into(),
+            },
+            RadicalEntry {
+                radical: "冖".into(),
+                name: "민갓머리".into(),
+                meaning: "덮다".into(),
+                stroke_count: 2,
+                variants: vec![],
+                last_updated: "2026-07-11".into(),
+            },
+        ];
+        let mut by_radical: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        by_radical.insert("冖".into(), vec!["学".into(), "字".into()]);
+
+        let list = build_radicals_list(&radicals, &by_radical);
+        // 획수 오름차순 정렬: 冖(2획) → 木(4획)
+        assert_eq!(list[0].radical, "冖");
+        assert_eq!(list[0].kanji_count, 2);
+        // 역인덱스에 없는 부수는 0자로 집계
+        assert_eq!(list[1].radical, "木");
+        assert_eq!(list[1].kanji_count, 0);
     }
 }

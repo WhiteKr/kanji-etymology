@@ -192,6 +192,46 @@ a {
   color: var(--color-text);
 }
 
+/* 주 내비게이션 — 모바일에서는 글자를 줄이고 간격을 좁혀 한 줄 유지 */
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto; /* 검색 버튼 앞, 브랜드 뒤에서 오른쪽 정렬 */
+}
+
+.site-header__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 8px;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__nav-link:hover,
+.site-header__nav-link:focus-visible {
+  color: var(--color-accent);
+}
+
+/* 좁은 화면: 검색 버튼의 라벨·단축키 힌트를 숨겨 내비 공간 확보 */
+@media (max-width: 480px) {
+  .site-header__brand {
+    font-size: 0.95rem;
+  }
+
+  .site-header__nav-link {
+    padding: 0 6px;
+    font-size: 0.8rem;
+  }
+
+  .site-header__kbd {
+    display: none;
+  }
+}
+
 /* ── 검색 모달 ────────────────────────────────────────────── */
 
 .search-modal__overlay {
@@ -752,6 +792,264 @@ a {
   font-size: 0.78rem;
   color: var(--color-text-muted);
   margin: 8px 0 0;
+}
+
+/* ── 페이지 공통 타이틀 (browse / radicals / about) ──────── */
+
+.page-title {
+  font-size: 1.3rem;
+  margin: 16px 0 4px;
+}
+
+.page-lead {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  margin: 0 0 20px;
+}
+
+/* ── 둘러보기: 필터 칩 ───────────────────────────────────── */
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-group__label {
+  flex: 0 0 auto;
+  min-width: 44px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip:hover,
+.chip:focus-visible {
+  border-color: var(--color-link);
+}
+
+.chip--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.browse-results__summary {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  margin: 0 0 16px;
+}
+
+.browse__reset {
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* ── 부수 페이지: 헤더 ───────────────────────────────────── */
+
+.radical-header {
+  text-align: center;
+  padding: 24px 0 0;
+}
+
+.radical-header__char {
+  font-size: 5.5rem;
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.radical-header__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.radical-header__meaning {
+  margin: 14px 0 0;
+  font-size: 1.05rem;
+}
+
+/* ── 부수 인덱스: 카드 목록 ──────────────────────────────── */
+
+.radical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radical-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: var(--touch-target);
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.radical-card:hover,
+.radical-card:focus-visible {
+  border-color: var(--color-link);
+}
+
+.radical-card__char {
+  flex: 0 0 auto;
+  font-size: 2.2rem;
+  line-height: 1.2;
+  color: var(--color-accent);
+}
+
+.radical-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.radical-card__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.radical-card__meaning {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radical-card__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+/* ── 404·미등재: 추천 블록 ───────────────────────────────── */
+
+.suggest__search {
+  text-align: center;
+}
+
+.suggest__search-button {
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* ── 소개 페이지 ─────────────────────────────────────────── */
+
+.about__quote {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: 0 6px 6px 0;
+  font-weight: 500;
+}
+
+.about__table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.about__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+}
+
+.about__table th,
+.about__table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.about__table th {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  background: var(--color-surface-alt);
+}
+
+.about__labels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about__labels li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.about__label-badge {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+}
+
+.about__label-desc {
+  flex: 1 1 240px;
+  font-size: 0.9rem;
+}
+
+.about__list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.about__list li {
+  margin-bottom: 6px;
 }
 
 /* ── 데스크톱 확장 (모바일 퍼스트 → 넓은 화면) ───────────── */
