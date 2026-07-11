@@ -16,13 +16,13 @@ use serde::{Deserialize, Serialize};
 /// 로컬 `dx serve`에서 제출하면 403이 돌아오는 것이 정상이다.
 pub const FEEDBACK_ENDPOINT: &str = "https://kanji-feedback.whitekr.workers.dev/feedback";
 
-/// Cloudflare Turnstile 사이트 키.
+/// Cloudflare Turnstile 사이트 키 (공개 값 — HTML에 노출됨).
 ///
-/// 현재 값은 Cloudflare 공식 **테스트 키**(항상 통과, 가시 위젯)다.
-/// 실키 교체 방법: Cloudflare 대시보드 → Turnstile → 위젯 생성(도메인:
-/// `whitekr.github.io`) 후 발급된 sitekey를 여기 붙여넣고, Worker 쪽
-/// `TURNSTILE_SECRET` secret도 짝이 되는 시크릿 키로 갱신한다.
-pub const TURNSTILE_SITE_KEY: &str = "1x00000000000000000000AA";
+/// `whitekr.github.io` 도메인용 실키. 위젯을 재발급하면 이 값을 교체하고,
+/// Worker 쪽 `TURNSTILE_SECRET` secret도 짝이 되는 시크릿 키로 갱신한다
+/// (`npx wrangler secret put TURNSTILE_SECRET`).
+/// 로컬 개발용 테스트 키(항상 통과): "1x00000000000000000000AA"
+pub const TURNSTILE_SITE_KEY: &str = "0x4AAAAAADz4ur5SaoKcbjIV";
 
 /// 콘텐츠 저장소 Issues URL — 성공 안내 링크와 "직접 제보" 보조 링크에 사용.
 pub const GITHUB_ISSUES_URL: &str = "https://github.com/WhiteKr/kanji-etymology/issues";
