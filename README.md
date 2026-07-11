@@ -7,7 +7,7 @@
 
 **배포**: <https://whitekr.github.io/kanji-etymology/> (main push 시 자동 배포)
 
-> 🚧 **현재 상태**: 구현 중 — M8 (PWA + CI/CD). [구현 계획](docs/2026-07-11-implementation-plan.md) 참조.
+> ✅ **현재 상태**: MVP 배포됨 (한자 50자, M1~M8 완료). 남은 것: 콘텐츠 검수([검수 노트](docs/content-review-notes.md)), 피드백 Worker 배포. [구현 계획](docs/2026-07-11-implementation-plan.md) 참조.
 
 ## 로컬 개발
 
