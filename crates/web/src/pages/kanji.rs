@@ -7,6 +7,7 @@ use dioxus::prelude::*;
 use kanji_schema::{Component, Confidence, Evolution, Related, Source, Word};
 
 use crate::api::{self, FetchError, KanjiDetail};
+use crate::feedback_modal::{self, FeedbackModal};
 use crate::Route;
 
 /// 신뢰도 값 → (표시 문구, CSS modifier 클래스).
@@ -87,6 +88,9 @@ fn KanjiArticle(detail: KanjiDetail) -> Element {
     let (conf_label, conf_class) = confidence_label(entry.confidence);
     let body_html = api::markdown_to_html(&detail.body_markdown);
     let meanings = entry.meanings.join(" · ");
+    // 정정 제안에 첨부할 "지금 보고 있는 설명"의 지문 (logic.rs의
+    // current_explanation_hash). 콘텐츠가 개정되면 해시가 달라진다.
+    let explanation_hash = feedback_modal::fnv1a_64_hex(&detail.body_markdown);
 
     rsx! {
         article {
@@ -134,6 +138,8 @@ fn KanjiArticle(detail: KanjiDetail) -> Element {
                 words: entry.words.clone(),
                 related: entry.related.clone(),
                 sources: entry.sources.clone(),
+                kanji: entry.character.clone(),
+                explanation_hash,
             }
         }
     }
@@ -192,7 +198,16 @@ fn ComponentCards(components: Vec<Component>) -> Element {
 
 /// "더 깊이" 섹션 — 단어, 관련 한자, 출처, 정정 제안.
 #[component]
-fn DeeperSection(words: Vec<Word>, related: Vec<Related>, sources: Vec<Source>) -> Element {
+fn DeeperSection(
+    words: Vec<Word>,
+    related: Vec<Related>,
+    sources: Vec<Source>,
+    kanji: String,
+    explanation_hash: String,
+) -> Element {
+    // 정정 제안 모달 열림 상태 — 이 페이지(한자)에 국한된 로컬 시그널.
+    let mut feedback_open = use_signal(|| false);
+
     rsx! {
         section { class: "section deeper",
             h2 { class: "section__title", "더 깊이" }
@@ -253,14 +268,22 @@ fn DeeperSection(words: Vec<Word>, related: Vec<Related>, sources: Vec<Source>) 
                 }
             }
 
-            // 정정 제안 — 자리만. 실제 제출 흐름(모달 → Worker → GitHub Issue)은 M7.
+            // 정정 제안 — 모달 → Worker → GitHub Issue 자동 생성 (M7 여정 C).
             div { class: "feedback",
                 button { class: "feedback__button", r#type: "button",
-                    title: "정정 제안 기능은 준비 중입니다 (M7)",
+                    onclick: move |_| feedback_open.set(true),
                     "⚠️ 이 어원 설명에 이의 제기 / 정정 제안"
                 }
-                p { class: "feedback__note", "정정 제안 기능은 준비 중입니다." }
+                p { class: "feedback__note",
+                    "다른 견해나 오류 제보를 환영합니다. 검토 후 콘텐츠에 반영됩니다."
+                }
             }
+        }
+
+        FeedbackModal {
+            kanji,
+            explanation_hash,
+            open: feedback_open,
         }
     }
 }

@@ -6,6 +6,7 @@
 use dioxus::prelude::*;
 
 mod api;
+mod feedback_modal;
 mod pages;
 mod search;
 mod search_modal;

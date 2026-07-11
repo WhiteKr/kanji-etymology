@@ -782,16 +782,240 @@ a {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  color: var(--color-text-muted);
+  color: var(--color-text);
   font-family: inherit;
   font-size: 0.9rem;
-  cursor: not-allowed;
+  cursor: pointer;
+}
+
+.feedback__button:hover,
+.feedback__button:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 .feedback__note {
   font-size: 0.78rem;
   color: var(--color-text-muted);
   margin: 8px 0 0;
+}
+
+/* ── 정정 제안 모달 (M7) ─────────────────────────────────── */
+
+.feedback-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 6vh 16px 16px;
+  overflow-y: auto;
+  background: rgba(43, 42, 38, 0.45);
+}
+
+.feedback-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  padding: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(43, 42, 38, 0.25);
+}
+
+.feedback-modal__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.feedback-modal__char {
+  flex: 0 0 auto;
+  font-size: 2.6rem;
+  line-height: 1.1;
+  color: var(--color-accent);
+}
+
+.feedback-modal__heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feedback-modal__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.feedback-modal__intro {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.feedback-modal__close {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.feedback-modal__close:hover,
+.feedback-modal__close:focus-visible {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.feedback-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.feedback-modal__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.feedback-modal__textarea,
+.feedback-modal__input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.feedback-modal__textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.feedback-modal__textarea:focus-visible,
+.feedback-modal__input:focus-visible {
+  outline: none;
+  border-color: var(--color-link);
+}
+
+.feedback-modal__input {
+  min-height: var(--touch-target);
+}
+
+.feedback-modal__counter {
+  margin: 0;
+  text-align: right;
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+}
+
+.feedback-modal__counter--invalid {
+  color: var(--color-accent);
+}
+
+/* 허니팟 — display:none 대신 화면 밖으로 밀어내 DOM에는 남긴다.
+   사람에게 안 보이고 포커스도 안 되지만 봇 자동 완성은 채우게 된다. */
+.feedback-modal__website {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.feedback-modal__turnstile {
+  /* Turnstile 기본(normal) 위젯 크기 300×65 — 로드 전 레이아웃 점프 방지 */
+  min-height: 65px;
+  margin-top: 6px;
+}
+
+.feedback-modal__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.feedback-modal__error {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--color-conf-tentative-bg);
+  color: var(--color-conf-tentative-text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.feedback-modal__submit {
+  min-height: var(--touch-target);
+  margin-top: 8px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.feedback-modal__submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.feedback-modal__submit:not(:disabled):hover,
+.feedback-modal__submit:not(:disabled):focus-visible {
+  filter: brightness(1.1);
+}
+
+.feedback-modal__github {
+  align-self: center;
+  margin-top: 4px;
+  min-height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-link);
+  font-size: 0.85rem;
+}
+
+.feedback-modal__success {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 0;
+}
+
+.feedback-modal__success-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-conf-well-text);
+}
+
+.feedback-modal__success-detail {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
 }
 
 /* ── 페이지 공통 타이틀 (browse / radicals / about) ──────── */
