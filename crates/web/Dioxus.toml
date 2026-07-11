@@ -1,0 +1,8 @@
+[application]
+name = "kanji-web"
+default_platform = "web"
+
+[web.app]
+title = "한자 어원 사전"
+# GitHub Pages 프로젝트 페이지로 배포할 경우 M8에서 base_path 설정
+# base_path = "<repo-name>"

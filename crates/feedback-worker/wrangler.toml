@@ -1,0 +1,11 @@
+# Cloudflare Worker 설정 — M7에서 구성 확정
+name = "kanji-feedback"
+main = "build/worker/shim.mjs"
+compatibility_date = "2026-07-01"
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+# M7에서 추가:
+# - KV 네임스페이스 (rate limit)
+# - secrets: GITHUB_PAT, TURNSTILE_SECRET

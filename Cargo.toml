@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/web",
+    "crates/build-data",
+    "crates/feedback-worker",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "UNLICENSED" # 라이선스 미정 (README 참조)
+repository = ""
+
+# 공유 의존성은 M2에서 스키마 크레이트 도입 시 여기에 추가
+[workspace.dependencies]
+
+# WASM 릴리스 번들 크기 최적화 (설계 15장 리스크 대응)
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true

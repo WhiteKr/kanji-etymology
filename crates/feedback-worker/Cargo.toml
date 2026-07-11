@@ -1,0 +1,11 @@
+[package]
+name = "feedback-worker"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# M7에서 추가: worker (workers-rs), serde, serde_json 등
+# workers-rs 도입 전까지는 빈 라이브러리로 워크스페이스 빌드만 통과시킨다.

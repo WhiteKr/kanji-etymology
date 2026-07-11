@@ -1,0 +1,7 @@
+[package]
+name = "kanji-web"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dioxus = { version = "0.7", features = ["web", "router"] }

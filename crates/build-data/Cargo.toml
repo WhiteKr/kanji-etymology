@@ -1,0 +1,7 @@
+[package]
+name = "build-data"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# M2에서 추가: serde, serde_yaml, serde_json, anyhow 등
