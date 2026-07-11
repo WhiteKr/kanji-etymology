@@ -107,6 +107,11 @@ pub async fn fetch_kanji_list() -> Result<Vec<KanjiSummary>, FetchError> {
     fetch_json(&format!("{DATA_DIR}/kanji-list.json")).await
 }
 
+/// 검색 인덱스(`search-index.json`)를 불러온다 (M5 — 검색 모달 첫 오픈 시 lazy).
+pub async fn fetch_search_index() -> Result<crate::search::SearchIndex, FetchError> {
+    fetch_json(&format!("{DATA_DIR}/search-index.json")).await
+}
+
 /// 어원 서술 마크다운 → HTML 변환 (pulldown-cmark, wasm 호환).
 pub fn markdown_to_html(markdown: &str) -> String {
     use pulldown_cmark::{html, Options, Parser};

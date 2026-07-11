@@ -4,8 +4,10 @@ mod kanji;
 mod landing;
 mod not_found;
 mod radical;
+mod search;
 
 pub use kanji::KanjiPage;
 pub use landing::Landing;
 pub use not_found::NotFound;
 pub use radical::RadicalPage;
+pub use search::SearchPage;

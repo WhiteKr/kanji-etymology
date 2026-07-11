@@ -1,8 +1,9 @@
-//! 랜딩 페이지 — 검색 바 자리(M5), 오늘의 한자, 전체 한자 카드 그리드.
+//! 랜딩 페이지 — 검색 바(M5 모달 오픈), 오늘의 한자, 전체 한자 카드 그리드.
 
 use dioxus::prelude::*;
 
 use crate::api::{self, KanjiSummary};
+use crate::search_modal;
 use crate::Route;
 
 /// 한자 요약 → 한자 페이지 라우트.
@@ -23,15 +24,15 @@ pub fn Landing() -> Element {
                 h1 { class: "landing__title", "한자 어원 사전" }
                 p { class: "landing__tagline", "한자를 외우지 않고 이해하기 — 어원 스토리와 부수 분해" }
 
-                // 검색 바 자리 — 실제 검색은 M5에서 구현.
-                div { class: "search-placeholder",
-                    input {
-                        class: "search-placeholder__input",
-                        r#type: "search",
-                        placeholder: "한자·한국음·뜻·일본어로 검색 (준비 중)",
-                        disabled: true,
-                        aria_label: "검색 (준비 중)",
-                    }
+                // 검색 바 — 클릭하면 검색 모달이 열린다 (M5).
+                // 실제 입력은 모달에서 받으므로 input이 아닌 버튼으로 렌더.
+                button {
+                    class: "search-bar",
+                    r#type: "button",
+                    aria_label: "검색 열기",
+                    onclick: move |_| search_modal::open_search(),
+                    span { class: "search-bar__hint", "한자·한국음·뜻·일본어로 검색" }
+                    kbd { class: "search-bar__kbd", "/" }
                 }
             }
 
