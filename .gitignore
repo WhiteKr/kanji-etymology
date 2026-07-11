@@ -16,6 +16,10 @@
 .dioxus/
 /build/
 
+# build-data 산출 데이터 JSON (dx asset으로 번들되는 생성물 — 커밋 금지)
+# 생성: cargo run -p build-data -- --content-dir content --out-dir crates/web/assets/data
+/crates/web/assets/data/
+
 # ──────────────────────────────────────────────────────────────
 # Cloudflare Workers (wrangler)
 # ──────────────────────────────────────────────────────────────

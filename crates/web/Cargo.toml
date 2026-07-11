@@ -5,3 +5,12 @@ edition.workspace = true
 
 [dependencies]
 dioxus = { version = "0.7", features = ["web", "router"] }
+kanji-schema = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+# 브라우저 fetch 래퍼 — 상대 경로 요청을 지원해서 reqwest(절대 URL 필수)보다 적합
+gloo-net = { version = "0.6", default-features = false, features = ["http", "json"] }
+# 어원 서술(body_markdown) → HTML 변환. wasm 호환, CLI 기능(getopts)은 제외
+pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
+# "오늘의 한자" 날짜 기반 결정적 선택에 사용 (Date.now)
+js-sys = "0.3"
