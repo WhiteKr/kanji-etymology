@@ -20,6 +20,8 @@ serde_yaml = "0.9"
 serde_json = "1"
 anyhow = "1"
 kanji-schema = { path = "crates/kanji-schema" }
+# KANJIDIC2 XML 파싱용 (build-data import-kanjidic 서브커맨드)
+quick-xml = "0.36"
 
 # WASM 릴리스 번들 크기 최적화 (설계 15장 리스크 대응)
 [profile.release]

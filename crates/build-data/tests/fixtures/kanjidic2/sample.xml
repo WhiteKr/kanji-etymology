@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  KANJIDIC2 축소 픽스처 (테스트 전용).
+  실제 KANJIDIC2(一, 二, 三 세 글자만 발췌·단순화)를 본떠 만든 것으로,
+  전자사전연구개발그룹(EDRDG)이 배포하는 원본 KANJIDIC2와는 다르다.
+  원본: http://www.edrdg.org/wiki/index.php/KANJIDIC_Project (CC-BY-SA 4.0)
+-->
+<kanjidic2>
+  <header>
+    <file_version>4</file_version>
+    <database_version>test-fixture</database_version>
+    <date_of_creation>2000-01-01</date_of_creation>
+  </header>
+  <character>
+    <literal>一</literal>
+    <codepoint>
+      <cp_value cp_type="ucs">4e00</cp_value>
+    </codepoint>
+    <radical>
+      <rad_value rad_type="classical">1</rad_value>
+    </radical>
+    <misc>
+      <grade>1</grade>
+      <stroke_count>1</stroke_count>
+      <freq>2</freq>
+      <jlpt>4</jlpt>
+    </misc>
+    <reading_meaning>
+      <rmgroup>
+        <reading r_type="pinyin">yi1</reading>
+        <reading r_type="korean_r">il</reading>
+        <reading r_type="korean_h">일</reading>
+        <reading r_type="ja_on">イチ</reading>
+        <reading r_type="ja_on">イツ</reading>
+        <reading r_type="ja_kun">ひと.つ</reading>
+        <meaning>one</meaning>
+      </rmgroup>
+    </reading_meaning>
+  </character>
+  <character>
+    <literal>二</literal>
+    <codepoint>
+      <cp_value cp_type="ucs">4e8c</cp_value>
+    </codepoint>
+    <radical>
+      <rad_value rad_type="classical">2</rad_value>
+    </radical>
+    <misc>
+      <grade>1</grade>
+      <stroke_count>2</stroke_count>
+      <stroke_count>3</stroke_count>
+      <freq>8</freq>
+      <jlpt>4</jlpt>
+    </misc>
+    <reading_meaning>
+      <rmgroup>
+        <reading r_type="pinyin">er4</reading>
+        <reading r_type="korean_r">i</reading>
+        <reading r_type="korean_h">이</reading>
+        <reading r_type="ja_on">ニ</reading>
+        <reading r_type="ja_on">ジ</reading>
+        <reading r_type="ja_kun">ふた</reading>
+        <reading r_type="ja_kun">ふた.つ</reading>
+        <meaning>two</meaning>
+      </rmgroup>
+    </reading_meaning>
+  </character>
+  <character>
+    <literal>三</literal>
+    <codepoint>
+      <cp_value cp_type="ucs">4e09</cp_value>
+    </codepoint>
+    <radical>
+      <rad_value rad_type="classical">1</rad_value>
+    </radical>
+    <misc>
+      <grade>1</grade>
+      <stroke_count>3</stroke_count>
+      <freq>78</freq>
+      <jlpt>4</jlpt>
+    </misc>
+    <reading_meaning>
+      <rmgroup>
+        <reading r_type="pinyin">san1</reading>
+        <reading r_type="korean_r">sam</reading>
+        <reading r_type="korean_h">삼</reading>
+        <reading r_type="ja_on">サン</reading>
+        <reading r_type="ja_kun">み</reading>
+        <reading r_type="ja_kun">み.つ</reading>
+        <reading r_type="ja_kun">みっ.つ</reading>
+        <meaning>three</meaning>
+        <meaning m_lang="fr">trois</meaning>
+        <meaning m_lang="es">tres</meaning>
+      </rmgroup>
+    </reading_meaning>
+  </character>
+</kanjidic2>

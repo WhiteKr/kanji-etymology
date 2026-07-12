@@ -32,6 +32,35 @@ dx serve -p kanji-web
 cargo test --workspace
 ```
 
+## 콘텐츠 확장: KANJIDIC2 임포트 (초안 스켈레톤 생성)
+
+새 한자 콘텐츠를 처음부터 손으로 쓰는 대신, [KANJIDIC2](http://www.edrdg.org/wiki/index.php/KANJIDIC_Project)에서
+기계적 필드(음독·훈독·한국음·획수·학년·영어 의미)를 뽑아 `content/kanji/{글자}.md` 형식의
+**초안 스켈레톤**을 생성할 수 있습니다. 어원 서술(본문)은 사람/AI가 나중에 채웁니다.
+
+```powershell
+# KANJIDIC2 XML은 아래 배포처에서 직접 내려받아야 합니다 (이 도구는 다운로드하지 않음).
+# http://www.edrdg.org/wiki/index.php/KANJIDIC_Project
+
+cargo run -p build-data -- import-kanjidic `
+  --xml kanjidic2.xml `
+  --chars 一二三 `
+  --out-dir drafts `
+  --skip-existing --content-dir content
+
+# 옵션 전체: cargo run -p build-data -- import-kanjidic --help
+```
+
+생성된 스켈레톤은 `jlpt`/`korean.meaning`/`last_updated` 등 KANJIDIC2에 없는 값을
+`"TODO"` placeholder로, 영어 의미는 `meanings`에 `"(en) ..."` 접두로 임시 표기합니다
+(한국어 번역·어원 서술 필요). 따라서 **`build-data`의 콘텐츠 검증을 통과하지 못합니다** —
+TODO를 실제 값으로 채우고 어원 서술을 작성한 뒤 `content/kanji/`로 옮겨야 정식 콘텐츠가 됩니다.
+
+> **KANJIDIC2 라이선스**: 전자사전연구개발그룹(EDRDG)이 CC-BY-SA 4.0으로 배포합니다.
+> 이 저장소는 KANJIDIC2 XML을 포함하거나 배포하지 않으며, `import-kanjidic`도 네트워크에서
+> 내려받지 않습니다 — 사용자가 위 배포처에서 직접 받은 로컬 파일 경로를 `--xml`로 넘겨야
+> 합니다. 생성된 스켈레톤의 `sources`에는 KANJIDIC2 출처·라이선스가 자동으로 기록됩니다.
+
 ## 문서
 
 - [MVP 디자인 (2026-05-27)](docs/2026-05-27-kanji-etymology-mvp-design.md)

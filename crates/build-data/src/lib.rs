@@ -12,8 +12,11 @@
 //! 구현 계획: `docs/2026-07-11-implementation-plan.md` M2절
 
 pub mod frontmatter;
+pub mod import_kanjidic;
 pub mod index;
 pub mod kana;
+pub mod kanjidic;
 pub mod pipeline;
+pub mod skeleton;
 
 pub use pipeline::{run, Summary};
