@@ -34,6 +34,10 @@
   --color-badge-kun-bg: #e6efe9;
   --color-badge-kun-text: #2f5d45;
 
+  /* 오버레이 (검색/피드백 모달 배경 딤·그림자) */
+  --color-overlay: rgba(43, 42, 38, 0.45);
+  --color-shadow: rgba(43, 42, 38, 0.25);
+
   /* 타이포그래피 */
   --font-body: -apple-system, BlinkMacSystemFont, "Pretendard",
     "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
@@ -44,6 +48,75 @@
   --touch-target: 44px;
   --radius: 10px;
   --page-max-width: 720px;
+}
+
+/* ── 다크 모드 팔레트 (Phase 2) ───────────────────────────────
+   라이트 팔레트의 명도 위계(배경 < 카드 < 테두리, 본문 텍스트 > 보조
+   텍스트)만 반전한 보수적인 변환 — 색조 자체를 새로 디자인하지 않는다.
+
+   a. 시스템 설정 폴백 — data-theme으로 명시 선택된 게 없을 때만 OS
+      다크 모드를 따른다 (`:not([data-theme="light"])`로 라이트 강제
+      선택 시에는 제외).
+   b. 명시적 다크 선택 — 토글 버튼으로 고른 값을 `data-theme="dark"`
+      속성에 반영한다 (main.rs SiteLayout 참고). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #1c1b18;
+    --color-surface: #262420;
+    --color-surface-alt: #302e28;
+    --color-border: #47443b;
+    --color-text: #ece8df;
+    --color-text-muted: #a89f8f;
+    --color-accent: #d17a52;
+    --color-accent-soft: #3d2a22;
+    --color-link: #86aed1;
+
+    --color-conf-well-bg: #223423;
+    --color-conf-well-text: #8ed092;
+    --color-conf-interp-bg: #362d18;
+    --color-conf-interp-text: #dcc178;
+    --color-conf-tentative-bg: #3c2620;
+    --color-conf-tentative-text: #e2967d;
+
+    --color-badge-korean-bg: #202c38;
+    --color-badge-korean-text: #9cc4ea;
+    --color-badge-on-bg: #2b2335;
+    --color-badge-on-text: #cdb0ea;
+    --color-badge-kun-bg: #1f2e27;
+    --color-badge-kun-text: #95d2ac;
+
+    --color-overlay: rgba(0, 0, 0, 0.6);
+    --color-shadow: rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #1c1b18;
+  --color-surface: #262420;
+  --color-surface-alt: #302e28;
+  --color-border: #47443b;
+  --color-text: #ece8df;
+  --color-text-muted: #a89f8f;
+  --color-accent: #d17a52;
+  --color-accent-soft: #3d2a22;
+  --color-link: #86aed1;
+
+  --color-conf-well-bg: #223423;
+  --color-conf-well-text: #8ed092;
+  --color-conf-interp-bg: #362d18;
+  --color-conf-interp-text: #dcc178;
+  --color-conf-tentative-bg: #3c2620;
+  --color-conf-tentative-text: #e2967d;
+
+  --color-badge-korean-bg: #202c38;
+  --color-badge-korean-text: #9cc4ea;
+  --color-badge-on-bg: #2b2335;
+  --color-badge-on-text: #cdb0ea;
+  --color-badge-kun-bg: #1f2e27;
+  --color-badge-kun-text: #95d2ac;
+
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-shadow: rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -61,6 +134,8 @@ body {
   font-family: var(--font-body);
   line-height: 1.65;
   word-break: keep-all; /* 한글 어절 단위 줄바꿈 */
+  /* 다크 모드 토글 시 배경/글자색이 부드럽게 바뀌도록. */
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* 한자·가나 표시 공통 클래스 */
@@ -192,6 +267,28 @@ a {
   color: var(--color-text);
 }
 
+/* 다크 모드 토글 — 검색 버튼 옆의 아이콘 버튼 (M2). */
+.site-header__theme-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.site-header__theme-toggle:hover,
+.site-header__theme-toggle:focus-visible {
+  background: var(--color-surface-alt);
+}
+
 /* 주 내비게이션 — 모바일에서는 글자를 줄이고 간격을 좁혀 한 줄 유지 */
 .site-header__nav {
   display: flex;
@@ -242,7 +339,7 @@ a {
   align-items: flex-start;
   justify-content: center;
   padding: 8vh 16px 16px;
-  background: rgba(43, 42, 38, 0.45);
+  background: var(--color-overlay);
 }
 
 .search-modal {
@@ -255,7 +352,7 @@ a {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  box-shadow: 0 12px 40px rgba(43, 42, 38, 0.25);
+  box-shadow: 0 12px 40px var(--color-shadow);
 }
 
 .search-modal__input {
@@ -812,7 +909,7 @@ a {
   justify-content: center;
   padding: 6vh 16px 16px;
   overflow-y: auto;
-  background: rgba(43, 42, 38, 0.45);
+  background: var(--color-overlay);
 }
 
 .feedback-modal {
@@ -825,7 +922,7 @@ a {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  box-shadow: 0 12px 40px rgba(43, 42, 38, 0.25);
+  box-shadow: 0 12px 40px var(--color-shadow);
 }
 
 .feedback-modal__header {

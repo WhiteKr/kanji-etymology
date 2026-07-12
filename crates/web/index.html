@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{app_title}</title>
+        <!--
+            다크 모드 FOUC 방지 (Phase 2).
+            dioxus-cli는 이 파일이 존재하면(crate 루트) 기본 index.html 대신
+            그대로 사용해 빌드한다 — 제목 등의 중괄호 플레이스홀더와 애셋
+            link/script 태그를 자동으로 채워 넣는다. 주의: 치환은 주석 안까지
+            파일 전체에 raw로 적용되므로 주석에 플레이스홀더 표기를 쓰지 말 것
+            (dioxus-cli 0.7.9 build/web.rs::prepare_html 참고).
+
+            아래 스크립트는 WASM이 로드되기 훨씬 전, HTML 파싱 시점에 동기 실행된다.
+            localStorage에 사용자가 명시적으로 고른 테마("light"/"dark")가 있을 때만
+            data-theme 속성을 미리 세팅해 첫 페인트부터 정확한 테마로 그려지게 한다.
+            저장된 값이 없으면 속성을 건드리지 않고 main.css의
+            `@media (prefers-color-scheme: dark)` 규칙이 시스템 설정을 그대로
+            따르게 둔다 — 이래야 OS 다크모드 설정을 바꿀 때도 새로고침 없이
+            실시간으로 반영된다.
+        -->
+        <script>
+            (function () {
+                try {
+                    var stored = localStorage.getItem("theme");
+                    if (stored === "light" || stored === "dark") {
+                        document.documentElement.setAttribute("data-theme", stored);
+                    }
+                } catch (e) {
+                    // localStorage 접근 불가(사생활 보호 모드 등) — 시스템 설정으로 대체.
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="main"></div>
+    </body>
+</html>

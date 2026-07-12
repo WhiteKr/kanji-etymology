@@ -123,6 +123,36 @@ fn App() -> Element {
     }
 }
 
+/// 다크 모드 상태 (M2 — Phase 2).
+///
+/// 실제 렌더링은 `<html>`의 `data-theme` 속성과 main.css의 CSS 변수가 담당한다.
+/// 이 시그널은 헤더 토글 버튼의 아이콘을 반응형으로 바꾸기 위한 것일 뿐,
+/// 진실의 원천(source of truth)은 어디까지나 DOM 속성 + localStorage다.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Theme {
+    Light,
+    Dark,
+}
+
+impl Theme {
+    fn as_str(self) -> &'static str {
+        match self {
+            Theme::Light => "light",
+            Theme::Dark => "dark",
+        }
+    }
+
+    /// 헤더 토글 버튼에 표시할 아이콘 — 현재 테마가 아니라 "누르면 바뀔 대상"을
+    /// 보여주는 흔한 관례 대신, 현재 상태를 그대로 보여준다(달 = 지금 라이트,
+    /// 해 = 지금 다크) 쪽이 상태 표시로서 더 명확해 이 방식을 택했다.
+    fn icon(self) -> &'static str {
+        match self {
+            Theme::Light => "🌙",
+            Theme::Dark => "☀️",
+        }
+    }
+}
+
 /// 사이트 공통 레이아웃 — 상단 헤더(브랜드 + 검색 버튼) + 본문 + 검색 모달.
 /// 어느 페이지에서든 헤더 버튼 또는 `/` 단축키로 검색 모달을 열 수 있다.
 #[component]
@@ -149,6 +179,45 @@ fn SiteLayout() -> Element {
         });
     });
 
+    // 다크 모드 토글 상태. `data-theme` DOM 속성 자체는 index.html의 인라인
+    // 스크립트가 (명시적 선택이 저장돼 있을 때만) WASM 로드 전에 이미 세팅해
+    // 두었으므로 FOUC는 여기서 신경 쓸 게 없다 — 아래 effect는 그 결과값을
+    // 읽어와 토글 버튼 아이콘을 맞추는 용도다.
+    let mut theme = use_signal(|| Theme::Light);
+    use_effect(move || {
+        spawn(async move {
+            let mut eval = document::eval(
+                r#"
+                const stored = localStorage.getItem("theme");
+                const effective = (stored === "light" || stored === "dark")
+                    ? stored
+                    : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+                        ? "dark"
+                        : "light");
+                dioxus.send(effective);
+                "#,
+            );
+            if let Ok(value) = eval.recv::<String>().await {
+                theme.set(if value == "dark" { Theme::Dark } else { Theme::Light });
+            }
+        });
+    });
+
+    // 토글 클릭 — 신호를 뒤집고, DOM 속성 + localStorage에 명시적으로 기록한다.
+    // 이 시점부터는 시스템 설정이 바뀌어도 이 값이 우선한다(main.css의
+    // `:root:not([data-theme="light"])` 폴백 규칙 참고).
+    let toggle_theme = move |_| {
+        let next = if theme() == Theme::Dark { Theme::Light } else { Theme::Dark };
+        theme.set(next);
+        let value = next.as_str();
+        document::eval(&format!(
+            r#"
+            document.documentElement.setAttribute("data-theme", "{value}");
+            localStorage.setItem("theme", "{value}");
+            "#
+        ));
+    };
+
     rsx! {
         header { class: "site-header",
             div { class: "site-header__inner",
@@ -158,6 +227,13 @@ fn SiteLayout() -> Element {
                     Link { class: "site-header__nav-link", to: Route::BrowsePage {}, "둘러보기" }
                     Link { class: "site-header__nav-link", to: Route::RadicalsPage {}, "부수" }
                     Link { class: "site-header__nav-link", to: Route::AboutPage {}, "소개" }
+                }
+                button {
+                    class: "site-header__theme-toggle",
+                    r#type: "button",
+                    aria_label: if theme() == Theme::Dark { "라이트 모드로 전환" } else { "다크 모드로 전환" },
+                    onclick: toggle_theme,
+                    "{theme().icon()}"
                 }
                 button {
                     class: "site-header__search",
