@@ -395,8 +395,9 @@ a {
 }
 
 .search-result:hover,
-.search-result:focus-visible {
-  background: var(--color-surface-alt);
+.search-result:focus-visible,
+.search-result--active {
+  background: var(--color-accent-soft);
 }
 
 .search-result__char {

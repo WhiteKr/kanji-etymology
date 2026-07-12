@@ -107,6 +107,15 @@ pub fn search(index: &SearchIndex, query: &str) -> Vec<SearchHit> {
     hits
 }
 
+/// `search()` 결과 중 상위 `limit`개만 추출한다 (검색 모달 자동완성용).
+/// 정렬·병합 로직은 `search()`를 그대로 재사용하고, 여기서는 자르기만 한다 —
+/// 별도의 랭킹 기준을 새로 만들지 않는다.
+pub fn top_matches(index: &SearchIndex, query: &str, limit: usize) -> Vec<SearchHit> {
+    let mut hits = search(index, query);
+    hits.truncate(limit);
+    hits
+}
+
 /// 한자에 우선순위를 기록하되, 이미 더 높은(작은) 순위가 있으면 유지한다.
 fn note(best: &mut HashMap<String, MatchRank>, kanji: &str, rank: MatchRank) {
     match best.get_mut(kanji) {
@@ -401,5 +410,43 @@ mod tests {
         assert_eq!(to_hiragana("ガク"), "がく");
         assert_eq!(to_katakana("まなぶ"), "マナブ");
         assert_eq!(to_hiragana("学ぶ"), "学ぶ"); // 비가나 통과
+    }
+
+    // ── top_matches (자동완성 상위 N개 추출) ──────────────────
+
+    #[test]
+    fn top_matches_orders_like_full_search_and_truncates() {
+        let mut idx = SearchIndex::default();
+        // priority_exact_before_prefix_before_partial과 같은 구성: 정확(山) > 접두(学) > 부분(日)
+        idx.by_meaning.insert("산".into(), vec!["山".into()]);
+        idx.by_meaning.insert("산더미".into(), vec!["学".into()]);
+        idx.by_meaning.insert("화산".into(), vec!["日".into()]);
+
+        let full = search(&idx, "산");
+        assert_eq!(kanjis(&full), vec!["山", "学", "日"]);
+
+        let top2 = top_matches(&idx, "산", 2);
+        assert_eq!(top2.len(), 2);
+        assert_eq!(top2, full[..2]);
+        assert_eq!(kanjis(&top2), vec!["山", "学"]);
+    }
+
+    #[test]
+    fn top_matches_respects_limit_even_when_fewer_hits() {
+        // 후보가 limit보다 적으면 있는 만큼만 돌려준다.
+        let hits = top_matches(&fixture(), "学", 8);
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].kanji, "学");
+    }
+
+    #[test]
+    fn top_matches_limit_zero_returns_empty() {
+        assert!(top_matches(&fixture(), "学", 0).is_empty());
+    }
+
+    #[test]
+    fn top_matches_empty_query_returns_empty() {
+        assert!(top_matches(&fixture(), "", 8).is_empty());
+        assert!(top_matches(&fixture(), "   ", 8).is_empty());
     }
 }

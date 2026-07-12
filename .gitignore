@@ -50,6 +50,8 @@ pnpm-debug.log*
 # ──────────────────────────────────────────────────────────────
 # 에디터 / IDE
 # ──────────────────────────────────────────────────────────────
+# Claude Code 로컬 작업물 (에이전트 워크트리, 로컬 런치 설정)
+.claude/
 .vscode/
 !.vscode/settings.json.example
 !.vscode/extensions.json
